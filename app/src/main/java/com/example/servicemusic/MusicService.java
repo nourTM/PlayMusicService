@@ -42,9 +42,16 @@ public class MusicService extends Service {
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent =
                 PendingIntent.getActivity(this, 0, notificationIntent, 0);
-        // ce qu’on va faire si user clique sur le bouton de la notif
+        // ce qu’on va faire si user clique sur l'une des boutons de la notif on envoyant des intents
         PendingIntent pPPendingIntent =
                 PendingIntent.getBroadcast(this, 0, new Intent("PlayPause"),
+                        PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent nextPendingIntent =
+                PendingIntent.getBroadcast(this, 0, new Intent("Next"),
+                        PendingIntent.FLAG_UPDATE_CURRENT);
+
+        PendingIntent prevPendingIntent =
+                PendingIntent.getBroadcast(this, 0, new Intent("Prev"),
                         PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Notification Channel
@@ -63,7 +70,9 @@ public class MusicService extends Service {
                         .setContentTitle("Lecture en cours")
                         .setContentText("Song")
                         .setSmallIcon(R.drawable.musicnote)
+                        .addAction(R.drawable.prev,"Previous",prevPendingIntent)
                         .addAction(R.drawable.play, "Play/Pause", pPPendingIntent)
+                        .addAction(R.drawable.next,"Next",nextPendingIntent)
                         .setContentIntent(pendingIntent)
                         .setPriority(Notification.PRIORITY_MAX)
                         .build();
