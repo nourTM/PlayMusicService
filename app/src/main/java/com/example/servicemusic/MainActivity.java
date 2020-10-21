@@ -1,27 +1,39 @@
 package com.example.servicemusic;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+    final static int REQUEST_PERMISSION = 99 ;
+
     Button play;
     Button stop;
-    ArrayList<Music> musicList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getMusicList();
+
+        // ensure reading permission for all android users versions
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},REQUEST_PERMISSION);
+        }
+
+
+
         play=(Button)findViewById(R.id.play);
         play.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -43,30 +55,12 @@ public class MainActivity extends AppCompatActivity {
             });
     }
 
-    private ArrayList getMusicList() {
-        ContentResolver contentResolver = getContentResolver();
-        Uri songUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-
-        Cursor cursor = contentResolver.query(songUri, null, null, null, null);
-
-        if (cursor != null && cursor.moveToFirst()) {
-
-            int indexTitle = cursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
-            int indexArtist = cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
-            int indexPath = cursor.getColumnIndex(MediaStore.Audio.Media.DATA);
-
-            do {
-                String title = cursor.getString(indexTitle);
-                String artist = cursor.getString(indexArtist);
-                String path = cursor.getString(indexPath);
-
-                Music song = new Music(title, artist, path);
-
-                musicList.add(song);
-
-            } while (cursor.moveToNext());
+    /*@Override
+    protected void onResume() {
+        super.onResume();
+        for (int i = 0; i < musicList.size();i++) {
+            Toast.makeText(getApplicationContext(),musicList.get(i).getTitle(),Toast.LENGTH_SHORT).show();
         }
-        return musicList;
-    }
+    }*/
 
 }
